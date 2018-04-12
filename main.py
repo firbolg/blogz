@@ -30,6 +30,9 @@ def blogstuff():
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def new_post():
+    title_error = "Please give your blog a title"
+    body_error = "Please write some stuff"
+
 
     if request.method == 'GET':
         return render_template('newpost.html')
@@ -37,10 +40,25 @@ def new_post():
     if request.method == 'POST':
         blog_title = request.form['title']
         blog_body = request.form['body']
-        new_post = Blog(blog_title, blog_body)
-        db.session.add(new_post)
-        db.session.commit()
-        return redirect('/blog')
+
+        
+        if (not blog_title) or (blog_title.strip() == ""):
+            if (not blog_body) or (blog_body.strip() == ""):
+                return render_template('newpost.html', blog_title=blog_title, blog_body=blog_body, title_error=title_error, body_error=body_error)  
+            else:
+                return render_template('newpost.html', blog_title=blog_title, blog_body=blog_body, title_error=title_error)
+
+        if (not blog_body) or (blog_body.strip() == ""):
+            return render_template('newpost.html', blog_title=blog_title, blog_body=blog_body, body_error=body_error)
+
+        if (not blog_title) or (blog_title.strip() == "") and (not blog_body) or (blog_body.strip() == ""): 
+            return render_template('newpost.html', blog_title=blog_title, blog_body=blog_body, title_error=title_error, body_error=body_error)  
+        
+        else: 
+            new_post = Blog(blog_title, blog_body)
+            db.session.add(new_post)
+            db.session.commit()
+            return redirect('/blog')
 
 
 
