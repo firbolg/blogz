@@ -25,7 +25,13 @@ class Blog(db.Model):
 @app.route('/blog', methods=['POST', 'GET'])
 def blogstuff():
     blogs = Blog.query.all()
-    return render_template('blog.html', blogs=blogs) 
+    clicked = request.args.get(Blog.id)
+    #mainpage = request.form['mainblogpage']
+    if (clicked):
+        return render_template('entry.html')
+
+    else:
+        return render_template('blog.html', blogs=blogs)
 
 
 @app.route('/newpost', methods=['POST', 'GET'])
@@ -59,6 +65,15 @@ def new_post():
             db.session.add(new_post)
             db.session.commit()
             return redirect('/blog')
+
+
+@app.route('/blog?id={{ blog.id }}', methods=['POST', 'GET'])
+def entry():
+    
+    blog_title = request.args.get('{{ blog.title }}')
+    blog_body = request.args.get('{{ blog.body }}')
+
+    return render_template('entry.html', entry=entry, blog_title=blog_title, blog_body=blog_body)  
 
 
 

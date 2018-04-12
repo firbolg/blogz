@@ -13,8 +13,13 @@
 
         
             {% for blog in blogs %}
-                <h2>{{blog.title}}<h2>
+            
+            <a href='/blog?id={{ blog.id }}' >
+                <h2 type='text' name='title' value='{{ blog.title }}'>
+                {{ blog.title }}</h2></a>
+              
                 <h5>{{blog.body}}</h5>
+      
             {% endfor %}
         
         {% endif %}
