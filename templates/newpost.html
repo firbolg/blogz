@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Write What You Know</h1>
+    <form method='post'>
+        <label>
+            Title for your new blog:
+            <input type="text" name='title' />
+        </label>
+
+        <hr />
+        
+        <label>
+            Your new blog:
+        </label>
+            <textarea type="text" name='body'></textarea>
+            <input type="submit" value='Add Entry' />
+    </form>
+{% endblock %} 
