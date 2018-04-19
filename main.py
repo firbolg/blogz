@@ -63,7 +63,7 @@ def login():
 
 
 @app.route('/signup', methods=['POST', 'GET'])
-def register():
+def signup():
 
     if request.method == 'GET':
         return render_template('signup.html')
@@ -140,7 +140,7 @@ def new_post():
             return render_template('newpost.html', blog_title=blog_title, blog_body=blog_body, title_error=title_error, body_error=body_error)  
         
         else: 
-            new_post = Blog(blog_title, blog_body)
+            new_post = Blog(blog_title, blog_body) # user.id)
             db.session.add(new_post)
             db.session.commit()
             just_posted = db.session.query(Blog).order_by(Blog.id.desc()).first()
