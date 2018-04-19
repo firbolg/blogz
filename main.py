@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template
+from flask import Flask, request, redirect, render_template, session
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -6,6 +6,7 @@ app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:blogz@localhost:8889/blogz'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
+app.secret_key = 'thx1138'
 
 
 class Blog(db.Model):
@@ -34,6 +35,14 @@ class User(db.Model):
 
 
 
+@app.before_request
+def require_login():
+    allowed_routes = ['login', 'signup', 'blog', 'index']
+    if request.endpoint not in allowed_routes and 'username' not in session:
+        return redirect('/login')
+
+
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'GET':
@@ -44,11 +53,12 @@ def login():
         verify = request.form['verify']
         user = User.query.filter_by(username=username).first()
         if user and user.password == password:
-            #TODO 'remember' that the user has logged in
+            session['username'] = username
             return redirect('/newpost')
         else:
             #TODO explain why login failed
             return render_template('login.html')
+
 
 
 
@@ -69,12 +79,22 @@ def register():
             new_user = User(username, password, None)
             db.session.add(new_user)
             db.session.commit()
-            #TODO 'remember' the user
+            session['username'] = username
             return redirect('/newpost')
+
+        else:
+            #TODO user error message
+            pass
+
+
+
+@app.route('/logout')
+def logout():
+    del session['username']
+    return redirect('/blog')
 
 
     
-
 
 @app.route('/blog', methods=['POST', 'GET'])
 def blog():
