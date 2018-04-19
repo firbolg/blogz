@@ -24,7 +24,7 @@ class Blog(db.Model):
 class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(120))
+    username = db.Column(db.String(120), unique=True)
     password = db.Column(db.String(120))
     blogs = db.relationship('Blog', backref='owner')
 
@@ -32,6 +32,48 @@ class User(db.Model):
         self.username = username
         self.password = password
 
+
+
+@app.route('/login', methods=['POST', 'GET'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        verify = request.form['verify']
+        user = User.query.filter_by(username=username).first()
+        if user and user.password == password:
+            #TODO 'remember' that the user has logged in
+            return redirect('/newpost')
+        else:
+            #TODO explain why login failed
+            return render_template('login.html')
+
+
+
+@app.route('/signup', methods=['POST', 'GET'])
+def register():
+
+    if request.method == 'GET':
+        return render_template('signup.html')
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        verify = request.form['verify']
+        #TODO validate user's data
+
+        existing_user = User.query.filter_by(username=username).first()
+        if not existing_user:
+            new_user = User(username, password, None)
+            db.session.add(new_user)
+            db.session.commit()
+            #TODO 'remember' the user
+            return redirect('/newpost')
+
+
+    
 
 
 @app.route('/blog', methods=['POST', 'GET'])
