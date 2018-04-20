@@ -19,6 +19,9 @@
                 {{ blog.title }}</h2></a>
               
                 <h5>{{blog.body}}</h5>
+                    
+                <em> written by </em><em type='text' name='owner' value='{{ blog.owner.username }}'>{{ blog.owner.username }}</em>
+                        
       
             {% endfor %}
         

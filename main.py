@@ -17,7 +17,7 @@ class Blog(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
    
 
-    def __init__(self, title, body):
+    def __init__(self, title, body, owner):
         self.title = title
         self.body = body
         self.owner = owner
@@ -29,7 +29,7 @@ class User(db.Model):
     password = db.Column(db.String(120))
     blogs = db.relationship('Blog', backref='owner')
 
-    def __init__(self, username, password, blogs):
+    def __init__(self, username, password):
         self.username = username
         self.password = password
 
@@ -50,10 +50,10 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        verify = request.form['verify']
         user = User.query.filter_by(username=username).first()
         if user and user.password == password:
             session['username'] = username
+            #TODO pass username into newpost route
             return redirect('/newpost')
         else:
             #TODO explain why login failed
@@ -76,11 +76,12 @@ def signup():
 
         existing_user = User.query.filter_by(username=username).first()
         if not existing_user:
-            new_user = User(username, password, None)
+            new_user = User(username, password)
             db.session.add(new_user)
             db.session.commit()
             session['username'] = username
-            return redirect('/newpost')
+            #TODO pass username into /newpost route
+            return redirect('/newpost', username=username)
 
         else:
             #TODO user error message
@@ -100,6 +101,7 @@ def logout():
 def blog():
     blogs = Blog.query.all()
     id = request.args.get('id')
+    username = session['username']
 
     if not id:
         return render_template('blog.html', blogs=blogs)
@@ -108,7 +110,8 @@ def blog():
         blog = Blog.query.get(id)
         title = blog.title
         body = blog.body
-        return render_template('entry.html', blog_title=title, blog_body=body)
+        username = session['username']
+        return render_template('entry.html', blog_title=title, blog_body=body, username=username)
 
 
 
@@ -140,11 +143,15 @@ def new_post():
             return render_template('newpost.html', blog_title=blog_title, blog_body=blog_body, title_error=title_error, body_error=body_error)  
         
         else: 
-            new_post = Blog(blog_title, blog_body) # user.id)
+            session['username'] = username
+            user = User.query.filter_by(username=username).first()
+            owner = user.id
+            new_post = Blog(blog_title, blog_body, owner) # user.id
             db.session.add(new_post)
             db.session.commit()
             just_posted = db.session.query(Blog).order_by(Blog.id.desc()).first()
             id = str(just_posted.id)
+            #blog_author = just_posted.owner_id
             return redirect('/blog?id=' + id)
 
 
