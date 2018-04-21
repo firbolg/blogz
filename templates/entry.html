@@ -9,9 +9,9 @@
     
     <h5 type='text' name='{{blog_body }}'>{{ blog_body }}</h5>
 
-    <em type='text' name='{{ username }}' value="username">written by {{ username }}</em>
+    <em type='text'>written by <a href="blog?user={{ owner.username }}">{{ session['username'] }}</em>
 
     
            
         
-{% endblock %}   
+{% endblock %} 
