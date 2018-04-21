@@ -58,7 +58,6 @@ def login():
         if user and user.password == password:
             session['username'] = username
             flash("Log in successful!")
-            #TODO pass username into newpost route
             return redirect('/newpost')
         else:
             flash("Username does not exist")
@@ -85,7 +84,6 @@ def signup():
             db.session.add(new_user)
             db.session.commit()
             session['username'] = username
-            #TODO pass username into /newpost route
             return redirect('/newpost', username=username)
 
         else:
@@ -99,7 +97,7 @@ def signup():
 def blog():
     blogs = Blog.query.all()
     id = request.args.get('id')
-    username = session['username']
+
 
     if not id:
         return render_template('blog.html', blogs=blogs)
@@ -141,16 +139,12 @@ def new_post():
             return render_template('newpost.html', blog_title=blog_title, blog_body=blog_body, title_error=title_error, body_error=body_error)  
         
         else: 
-            #session['username'] = username
-            #user = User.query.filter_by(username=username).first()
-            #owner = user.id
             blog_owner = User.query.filter_by(username=session['username']).first()
             new_post = Blog(blog_title, blog_body, blog_owner) # user.id
             db.session.add(new_post)
             db.session.commit()
             just_posted = db.session.query(Blog).order_by(Blog.id.desc()).first()
             id = str(just_posted.id)
-            #blog_author = just_posted.owner_id
             return redirect('/blog?id=' + id)
 
 
@@ -158,15 +152,31 @@ def new_post():
 @app.route('/logout')
 def logout():
     del session['username']
-    return redirect('/blog')
-
-
+    return redirect('/')
+    
 
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
     allusers = User.query.all()
-    return render_template('index.html', users=allusers)
+    id = request.args.get('id')
+
+
+    if not id:
+        return render_template('index.html', users=allusers)
+
+    else: 
+        owner = User.query.get(id)
+        owned = Blog.query.filter_by(owner=user)
+        title = blog.title
+        body = blog.body
+        return render_template('singleUser.html', blog_title=title, blog_body=body, owner=owner)
+
+
+#The way I was getting authors list:
+#def index():
+    #allusers = User.query.all()
+    #return render_template('index.html', users=allusers)
 
 
 if __name__ == '__main__':
