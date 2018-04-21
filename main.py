@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, session
+from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -51,12 +51,17 @@ def login():
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
+        if user and user.password != password:
+            session['username'] = username
+            flash("This isn't the correct password")
+            return render_template('login.html', username=username)
         if user and user.password == password:
             session['username'] = username
+            flash("Log in successful!")
             #TODO pass username into newpost route
             return redirect('/newpost')
         else:
-            #TODO explain why login failed
+            flash("Username does not exist")
             return render_template('login.html')
 
 
@@ -89,13 +94,6 @@ def signup():
 
 
 
-@app.route('/logout')
-def logout():
-    del session['username']
-    return redirect('/blog')
-
-
-    
 
 @app.route('/blog', methods=['POST', 'GET'])
 def blog():
@@ -143,10 +141,11 @@ def new_post():
             return render_template('newpost.html', blog_title=blog_title, blog_body=blog_body, title_error=title_error, body_error=body_error)  
         
         else: 
-            session['username'] = username
-            user = User.query.filter_by(username=username).first()
-            owner = user.id
-            new_post = Blog(blog_title, blog_body, owner) # user.id
+            #session['username'] = username
+            #user = User.query.filter_by(username=username).first()
+            #owner = user.id
+            blog_owner = User.query.filter_by(username=session['username']).first()
+            new_post = Blog(blog_title, blog_body, blog_owner) # user.id
             db.session.add(new_post)
             db.session.commit()
             just_posted = db.session.query(Blog).order_by(Blog.id.desc()).first()
@@ -156,10 +155,18 @@ def new_post():
 
 
 
+@app.route('/logout')
+def logout():
+    del session['username']
+    return redirect('/blog')
+
+
+
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
-    return render_template('blog.html')
+    allusers = User.query.all()
+    return render_template('index.html', users=allusers)
 
 
 if __name__ == '__main__':
