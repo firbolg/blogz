@@ -3,7 +3,7 @@
 
 {% block content %}
 
-    <h1>BLOGZ!</h1>
+    <h1>Look, BLOGZ!</h1>
     
     <hr />
 
@@ -20,7 +20,8 @@
               
                 <h5>{{blog.body}}</h5>
                     
-                <em> written by </em><em type='text' name='owner' value='{{ blog.owner.username }}'>{{ blog.owner.username }}</em>
+                <em> written by </em><em type='text' name='owner' value='{{ blog.owner.username }}'>
+                    <a href='/blog?user={{ blog.owner.id }}' >{{ blog.owner.username }}</a></em>
                         
       
             {% endfor %}

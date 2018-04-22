@@ -1,20 +1,31 @@
 {% extends "base.html" %}
 
 
-{% extends "base.html" %}
-
 
 {% block content %}
 
-   
+    <h1>Look, BLOGZ!</h1>
 
-    <h1 type='text' name='{{ blog_title }}' value="entry">{{ blog_title }}</h1>
-    
-    <h5 type='text' name='{{blog_body }}'>{{ blog_body }}</h5>
-
-    <em type='text'>written by <a href="blog?user={{ owner }}">{{ owner }}</em>
+    {% if blogs_by|length == 0 %}
+    <p>No posts yet</p>
+    {% else %}
 
     
+        {% for blog in blogs_by %}
+        
+        <a href='/blog?id={{ blog.id }}' >
+            <h2 type='text' name='title' value='{{ blog.title }}'>
+            {{ blog.title }}</h2></a>
+          
+            <h5>{{blog.body}}</h5>
+                
+            <em> written by </em><em type='text' name='owner' value='{{ blog.owner.username }}'>
+                <a href='/blog?user={{ blog.owner.id }}' >{{ blog.owner.username }}</a></em>
+                    
+  
+        {% endfor %}
+    
+    {% endif %}
            
         
 {% endblock %} 

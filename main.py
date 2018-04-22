@@ -95,22 +95,24 @@ def signup():
 
 @app.route('/blog', methods=['POST', 'GET'])
 def blog():
-    blogs = Blog.query.all()
+    
+    user = request.args.get('user')
     id = request.args.get('id')
+    
+    if user:
+        blogs_by = Blog.query.filter_by(owner_id=user).all()
+        return render_template('singleUser.html', blogs_by=blogs_by)
 
-
-    if not id:
+    if id:
+        blogs = Blog.query.filter_by(id=id).all()
+        return render_template('blog.html', blogs=blogs)
+    
+    else:
+        blogs = Blog.query.all()
         return render_template('blog.html', blogs=blogs)
 
-    else: 
-        blog = Blog.query.get(id)
-        title = blog.title
-        body = blog.body
-        blog_owner = blog.owner.username
-        return render_template('entry.html', blog_title=title, blog_body=body, blog_owner=blog_owner)
 
-
-
+    
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def new_post():
@@ -159,24 +161,7 @@ def logout():
 @app.route('/', methods=['POST', 'GET'])
 def index():
     allusers = User.query.all()
-    id = request.args.get('id')
-
-
-    if not id:
-        return render_template('index.html', users=allusers)
-
-    else: 
-        owner = User.query.get(id)
-        owned = Blog.query.filter_by(owner=user)
-        title = blog.title
-        body = blog.body
-        return render_template('singleUser.html', blog_title=title, blog_body=body, owner=owner)
-
-
-#The way I was getting authors list:
-#def index():
-    #allusers = User.query.all()
-    #return render_template('index.html', users=allusers)
+    return render_template('index.html', users=allusers)
 
 
 if __name__ == '__main__':

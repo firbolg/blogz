@@ -9,7 +9,7 @@
 
         <li>
             {% for owner in users %}
-            <li><a href="blog?user={{ owner.username }}"><h2>{{ owner.username }}</h2></li>
+            <li><a href="blog?user={{ owner.id }}"><h2>{{ owner.username }}</h2></li>
             {% endfor %}
         </li>
 
