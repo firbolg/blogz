@@ -84,7 +84,7 @@ def signup():
             db.session.add(new_user)
             db.session.commit()
             session['username'] = username
-            return redirect('/newpost', username=username)
+            return redirect('/newpost')
 
         else:
             #TODO user error message
