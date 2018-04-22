@@ -106,8 +106,8 @@ def blog():
         blog = Blog.query.get(id)
         title = blog.title
         body = blog.body
-        username = session['username']
-        return render_template('entry.html', blog_title=title, blog_body=body, username=username)
+        blog_owner = blog.owner.username
+        return render_template('entry.html', blog_title=title, blog_body=body, blog_owner=blog_owner)
 
 
 
