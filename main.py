@@ -65,9 +65,13 @@ def login():
 
 
 
-
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
+    username_error = "Please enter a valid username"
+    username_error2 = "That username has already been taken"
+    password_error = "Please enter a valid password"
+    verify_error = "Please verify your password"
+    
 
     if request.method == 'GET':
         return render_template('signup.html')
@@ -76,21 +80,44 @@ def signup():
         username = request.form['username']
         password = request.form['password']
         verify = request.form['verify']
-        #TODO validate user's data
-
         existing_user = User.query.filter_by(username=username).first()
-        if not existing_user:
-            new_user = User(username, password)
-            db.session.add(new_user)
-            db.session.commit()
-            session['username'] = username
-            return redirect('/newpost')
 
+        if existing_user:
+            return render_template('signup.html', username_error2=username_error2)
+            
         else:
-            #TODO user error message
-            pass
 
+            if (not username) or (username.strip() == "") or len(username) < 3 or len(username) > 20 or (" " in username.strip()):
+                if (not password) or (password.strip() == "") or len(password) < 3 or len(password) > 20 or (" " in password.strip()):
+                    if not verify or (verify.strip() == "") or (verify != password):
+                        return render_template('signup.html', username=username, 
+                        username_error=username_error, password_error=password_error, verify_error=verify_error)  
+                    else:
+                        return render_template('signup.html', username=username,
+                        username_error=username_error, password_error=password_error)
+                else:
+                    return render_template('signup.html', username=username,
+                    username_error=username_error)
 
+            if (not password) or (password.strip() == "") or len(password) < 3 or len(password) > 20 or (" " in password.strip()):
+                if (not verify) or (verify.strip() == "") or (verify != password):
+                    return render_template('signup.html', username=username,  
+                    password_error=password_error, verify_error=verify_error)  
+                else:
+                    return render_template('signup.html', username=username, 
+                    password_error=password_error)
+        
+            if (not verify) or (verify.strip() == "") or (verify != password):
+                return render_template('signup.html', username=username,
+                verify_error=verify_error)  
+                
+            else:
+                new_user = User(username, password)
+                db.session.add(new_user)
+                db.session.commit()
+                session['username'] = username
+                return redirect('/newpost')
+            
 
 
 @app.route('/blog', methods=['POST', 'GET'])
@@ -113,7 +140,6 @@ def blog():
 
 
     
-
 @app.route('/newpost', methods=['POST', 'GET'])
 def new_post():
     title_error = "Please give your blog a title"
@@ -154,7 +180,7 @@ def new_post():
 @app.route('/logout')
 def logout():
     del session['username']
-    return redirect('/')
+    return redirect('/blog')
     
 
 

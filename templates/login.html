@@ -9,16 +9,25 @@
             <td><label for="username">Username</label></td>
             <td>
                 <input name="username" type="username" value="{{ username }}">
+                
             </td>
         </tr>
         <tr>
             <td><label for="password">Password</label></td>
             <td>
                 <input name="password" type="password">
+                
             </td>
         </tr>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        
+        {% for category,message in messages %}
+            <p class="error">{{ message }}</p>
+        {% endfor %}
+
+    {% endwith %}
     </table>
     <input type="submit" value="Login">
 </form>
-{{ message }}
+
 {% endblock %}

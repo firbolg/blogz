@@ -15,13 +15,7 @@
     <a href='/login' name='login'>Login</a>
     <a href='/logout' name='logout'>Logout</a>
 
-    {% with messages = get_flashed_messages(with_categories=True) %}
-        <ul>
-        {% for category,message in messages %}
-            <li class="{{category}}">{{message}}</li>
-        {% endfor %}
-        </ul>
-    {% endwith %}
+    
 
     {% block content %}
     
